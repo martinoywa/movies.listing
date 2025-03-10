@@ -1,8 +1,119 @@
 ## YTS.mx API Endpoints
 
+### `https://yts.mx/api/v2/list_movies.json`
+Used to list and search through out all the available movies. Can sort, filter, search and order the results.
+
+Query Parameters:
+| Parameter |	Required | Type |	Default |	Description |
+|-----------|----------|------|---------|-------------|
+| limit	| ✖️ | Integer between 1 - 50 (inclusive)	| 20 | The limit of results per page that has been set |
+| page	| ✖️ | Integer (Unsigned)	| 1 | Used to see the next page of movies, eg limit=15 and page=2 will show you movies 15-30 |
+
+Response Type: Object
+
+| Field    | Type                       |
+|----------|----------------------------|
+| status | String |
+| status_message | String |
+| data | JSON |
+| @meta | String |
+
+Example Query:
+https://yts.mx/api/v2/list_movies.json?limit=2&page=1
+
+Example Output:
+```
+{
+  "status": "ok",
+  "status_message": "Query was successful",
+  "data": {
+    "movie_count": 66249,
+    "limit": 2,
+    "page_number": 1,
+    "movies": [
+      {
+        "id": 67442,
+        "url": "https://yts.mx/movies/strike-the-village-that-fought-back-2024",
+        "imdb_code": "tt31652548",
+        "title": "Strike! The Village That Fought Back",
+        "title_english": "Strike! The Village That Fought Back",
+        "title_long": "Strike! The Village That Fought Back (2024)",
+        "slug": "strike-the-village-that-fought-back-2024",
+        "year": 2024,
+        "rating": 0,
+        "runtime": 60,
+        "genres": ["Documentary"],
+        "language": "en",
+        "background_image": "https://yts.mx/assets/images/movies/strike_the_village_that_fought_back_2024/background.jpg",
+        "small_cover_image": "https://yts.mx/assets/images/movies/strike_the_village_that_fought_back_2024/small-cover.jpg",
+        "medium_cover_image": "https://yts.mx/assets/images/movies/strike_the_village_that_fought_back_2024/medium-cover.jpg",
+        "large_cover_image": "https://yts.mx/assets/images/movies/strike_the_village_that_fought_back_2024/large-cover.jpg",
+        "torrents": [
+          {
+            "url": "https://yts.mx/torrent/download/D002390531A80E32F79430442B7F54A84AF8F21C",
+            "quality": "720p",
+            "type": "web",
+            "size": "541.65 MB",
+            "date_uploaded": "2025-03-10 16:31:18"
+          },
+          {
+            "url": "https://yts.mx/torrent/download/1592FEA5A235635E1BCF34078B888B8E4B0908E2",
+            "quality": "1080p",
+            "type": "web",
+            "size": "1003.94 MB",
+            "date_uploaded": "2025-03-10 17:09:59"
+          }
+        ]
+      },
+      {
+        "id": 67440,
+        "url": "https://yts.mx/movies/evil-bong-666-2017",
+        "imdb_code": "tt6462084",
+        "title": "Evil Bong 666",
+        "title_english": "Evil Bong 666",
+        "title_long": "Evil Bong 666 (2017)",
+        "slug": "evil-bong-666-2017",
+        "year": 2017,
+        "rating": 3.7,
+        "runtime": 65,
+        "genres": ["Comedy", "Horror"],
+        "language": "en",
+        "background_image": "https://yts.mx/assets/images/movies/evil_bong_666_2017/background.jpg",
+        "small_cover_image": "https://yts.mx/assets/images/movies/evil_bong_666_2017/small-cover.jpg",
+        "medium_cover_image": "https://yts.mx/assets/images/movies/evil_bong_666_2017/medium-cover.jpg",
+        "large_cover_image": "https://yts.mx/assets/images/movies/evil_bong_666_2017/large-cover.jpg",
+        "torrents": [
+          {
+            "url": "https://yts.mx/torrent/download/C05F62D0ADF0C67838EE9AAD8D2A2A9DD5CC0AB2",
+            "quality": "720p",
+            "type": "web",
+            "size": "603.85 MB",
+            "date_uploaded": "2025-03-10 15:54:40"
+          },
+          {
+            "url": "https://yts.mx/torrent/download/E3F80E81B671DD3AEFB205DCE40D9781BE2030F5",
+            "quality": "1080p",
+            "type": "web",
+            "size": "1.09 GB",
+            "date_uploaded": "2025-03-10 16:37:43"
+          }
+        ]
+      }
+    ]
+  },
+  "@meta": {
+    "server_time": 1741624614,
+    "server_timezone": "CET",
+    "api_version": 2,
+    "execution_time": "0.23 ms"
+  }
+}
+```
+
+----
+
 ### `GET https://yts.mx/api/v2/movie_details.jsonp`
 Returns the information about a specific movie.
-
 
 Query Parameters:
 | Parameter |	Required | Type |	Default |	Description |
@@ -14,7 +125,10 @@ Response Type: Object
 
 | Field    | Type                       |
 |----------|----------------------------|
+| status | String |
+| status_message | String |
 | data | JSON |
+| @meta | String |
 
 
 Example Query:
