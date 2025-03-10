@@ -1,377 +1,113 @@
-# Feathr Registry API Specifications
+## YTS.mx API Endpoints
 
-## Data Models
+### `GET https://yts.mx/api/v2/movie_details.jsonp`
+Returns the information about a specific movie.
 
-### EntityType
-Type: Enum
-
-| Value                       |
-|-----------------------------|
-| `feathr_workspace_v1`       |
-| `feathr_source_v1`          |
-| `feathr_anchor_v1`          |
-| `feathr_anchor_feature_v1`  |
-| `feathr_derived_feature_v1` |
-
-### ValueType
-Type: Enum
-
-| Value         |
-|---------------|
-| `UNSPECIFIED` |
-| `BOOL`        |
-| `INT32`       |
-| `INT64`       |
-| `FLOAT`       |
-| `DOUBLE`      |
-| `STRING`      |
-| `BYTES`       |
-
-### VectorType
-Type: Enum
-
-| Value    |
-|----------|
-| `TENSOR` |
-
-### TensorCategory
-Type: Enum
-
-| Value    |
-|----------|
-| `DENSE`  |
-| `SPARSE` |
-
-### FeatureType
-Type: Object
-
-| Field          | Type                                |
-|----------------|-------------------------------------|
-| type           | [`VectorType`](#valuetype)          |
-| tensorCategory | [`TensorCategory`](#tensorcategory) |
-| dimensionType  | [`array<ValueType>`](#valuetype)    |
-| valType        | [`ValueType`](#valuetype)           |
-
-### TypedKey
-Type: Object
-
-| Field            | Type                        |
-|------------------|-----------------------------|
-| key_column       | `string`                    |
-| key_column_type  | [`ValueType`](#valuetype)   |
-| full_name        | `string`, optional          |
-| description      | `string`, optional          |
-| key_column_alias | `string`, optional          |
-
-### ExpressionTransformation
-Type: Object
-
-| Field          | Type     |
-|----------------|----------|
-| transform_expr | `string` |
-
-### WindowAggregationTransformation
-Type: Object
-
-| Field    | Type               |
-|----------|--------------------|
-| def_expr | `string`           |
-| agg_func | `string`, optional |
-| window   | `string`, optional |
-| group_by | `string`, optional |
-| filter   | `string`, optional |
-| limit    | `number`, optional |
-
-### UdfTransformation
-Type: Object
-
-| Field | Type     |
-|-------|----------|
-| name  | `string` |
-
-### EntityReference
-Type: Object
-
-| Field            | Type                        | Comments                             |
-|------------------|-----------------------------|--------------------------------------|
-| guid             | `Guid`                      |                                      |
-| typeName         | [`EntityType`](#entitytype) |                                      |
-| uniqueAttributes | `map<string, string>`       | Contains `qualifiedName` only so far |
-
-### ProjectAttributes
-Type: Object
-
-| Field            | Type                                         |
-|------------------|----------------------------------------------|
-| qualifiedName    | `string`                                     |
-| name             | `string`                                     |
-| anchors          | [`array<EntityReference>`](#entityreference) |
-| sources          | [`array<EntityReference>`](#entityreference) |
-| anchor_features  | [`array<EntityReference>`](#entityreference) |
-| derived_features | [`array<EntityReference>`](#entityreference) |
-| tags             | `map<string, string>`                        |
-
-### SourceAttributes
-Type: Object
-
-| Field                | Type                  |
-|----------------------|-----------------------|
-| qualifiedName        | `string`              |
-| name                 | `string`              |
-| path                 | `string`              |
-| preprocessing        | `string`, optional    |
-| eventTimestampColumn | `string`, optional    |
-| timestampFormat      | `string`, optional    |
-| type                 | `string`              |
-| tags                 | `map<string, string>` |
-
-### AnchorAttributes
-Type: Object
-
-| Field         | Type                                         |
-|---------------|----------------------------------------------|
-| qualifiedName | `string`                                     |
-| name          | `string`                                     |
-| features      | [`array<EntityReference>`](#entityreference) |
-| source        | [`EntityReference`](#entityreference)        |
-| tags          | `map<string, string>`                        |
-
-### AnchorFeatureAttributes
-Type: Object
-
-| Field          | Type                           |
-|----------------|--------------------------------|
-| qualifiedName  | `string`                       |
-| name           | `string`                       |
-| type           | [`FeatureType`](#featuretype)  |
-| transformation | [`ExpressionTransformation`](#expressiontransformation) <br/> `or` [`WindowAggregationTransformation`](#windowaggregationtransformation) <br/> `or` [`UdfTransformation`](#udftransformation) |
-| key            | [`array<TypedKey>`](#typedkey) |
-| tags           | `map<string, string>`          |
-
-### DerivedFeatureAttributes
-Type: Object
-
-| Field                  | Type                           |
-|------------------------|--------------------------------|
-| qualifiedName          | `string`                       |
-| name                   | `string`                       |
-| type                   | [`FeatureType`](#featuretype)  |
-| transformation         | [`ExpressionTransformation`](#expressiontransformation) <br/> `or` [`WindowAggregationTransformation`](#windowaggregationtransformation) <br/> `or` [`UdfTransformation`](#udftransformation) |
-| key                    | [`array<TypedKey>`](#typedkey) |
-| input_anchor_features  | [`array<EntityReference>`](#entityreference) |
-| input_derived_features | [`array<EntityReference>`](#entityreference) |
-| tags                   | `map<string, string>`          |
-
-### EntityStatus
-Type: Enum
-
-| Value    |
-|----------|
-| `ACTIVE` |
-
-### Entity
-Type: Object
-
-| Field          | Type                            |
-|----------------|---------------------------------|
-| guid           | `Guid`                          |
-| lastModifiedTS | `string`                        |
-| status         | [`EntityStatus`](#entitystatus) |
-| displayText    | `string`                        |
-| typeName       | [`EntityType`](#entitytype)     |
-| attributes     | [`ProjectAttributes`](#projectattributes) <br/> `or` [`SourceAttributes`](#sourceattributes) <br/> `or` [`AnchorAttributes`](#anchorattributes) <br/> `or` [`AnchorFeatureAttributes`](#anchorfeatureattributes) <br/> `or` [`DerivedFeatureAttributes`](#derivedfeatureattributes) |
-
-### RelationshipType
-Type: Enum
-
-| Value       |
-|-------------|
-| `BelongsTo` |
-| `Contains`  |
-| `Produces`  |
-| `Consumes`  |
-
-### Relationship
-Type: Object
-
-| Field            | Type                                    |
-|------------------|-----------------------------------------|
-| relationshipId   | `Guid`                                  |
-| relationshipType | [`RelationshipType`](#relationshiptype) |
-| fromEntityId     | `Guid`                                  |
-| toEntityId       | `Guid`                                  |
-
-### ProjectDefinition
-Type: Object
-
-| Field                | Type                  |
-|----------------------|-----------------------|
-| qualifiedName        | `string`              |
-| tags                 | `map<string, string>` |
-
-
-### SourceDefinition
-Type: Object
-
-| Field                | Type                  |
-|----------------------|-----------------------|
-| qualifiedName        | `string`              |
-| name                 | `string`              |
-| path                 | `string`              |
-| preprocessing        | `string`, optional    |
-| eventTimestampColumn | `string`, optional    |
-| timestampFormat      | `string`, optional    |
-| type                 | `string`              |
-| tags                 | `map<string, string>` |
-
-### AnchorDefinition
-Type: Object
-
-| Field                | Type                  |
-|----------------------|-----------------------|
-| qualifiedName        | `string`              |
-| name                 | `string`              |
-| source_id            | `Guid`                |
-| tags                 | `map<string, string>` |
-
-### AnchorFeatureDefinition
-Type: Object
-
-| Field          | Type                           |
-|----------------|--------------------------------|
-| qualifiedName  | `string`                       |
-| name           | `string`                       |
-| featureType    | [`FeatureType`](#featuretype)  |
-| transformation | [`ExpressionTransformation`](#expressiontransformation) <br/> `or` [`WindowAggregationTransformation`](#windowaggregationtransformation) <br/> `or` [`UdfTransformation`](#udftransformation) |
-| key            | [`array<TypedKey>`](#typedkey) |
-| tags           | `map<string, string>`          |
-
-### DerivedFeatureDefinition
-Type: Object
-
-| Field                  | Type                           |
-|------------------------|--------------------------------|
-| qualifiedName          | `string`                       |
-| name                   | `string`                       |
-| featureType            | [`FeatureType`](#featuretype)  |
-| transformation         | [`ExpressionTransformation`](#expressiontransformation) <br/> `or` [`WindowAggregationTransformation`](#windowaggregationtransformation) <br/> `or` [`UdfTransformation`](#udftransformation) |
-| key                    | [`array<TypedKey>`](#typedkey) |
-| input_anchor_features  | `array<Guid>`                  |
-| input_derived_features | `array<Guid>`                  |
-| tags                   | `map<string, string>`          |
-
-
-### EntitiesAndRelationships
-Type: Object
-
-| Field         | Type                                   |
-|---------------|----------------------------------------|
-| guidEntityMap | [`map<Guid, Entity>`](#entity)         |
-| relations     | [`array<Relationship>`](#relationship) |
-
-
-## Feathr Registry API
-
-### `GET /projects`
-List **names** of all projects.
-
-Response Type: `array<string>`
-
-### `GET /projects-ids`
-Dictionary of **id** to **names** mapping of all projects.
-
-Response Type: `dict`
-
-### `GET /projects/{project}`
-Get everything defined in the project
-
-Response Type: [`EntitiesAndRelationships`](#entitiesandrelationships)
-
-### `GET /dependent/{entity}`
-Gets downstream/dependent entities for given entity
-
-### `GET /projects/{project}/datasources`
-Get all sources defined in the project.
-
-Response Type: [`array<Entity>`](#entity)
-
-### `GET /projects/{project}/features`
-Get all anchor features and derived features in the project, or only features meet the search criteria in the project.
 
 Query Parameters:
-
-| Field   | Type   |
-|---------|--------|
-| keyword | string |
-| size    | number |
-| offset  | number |
+| Parameter |	Required | Type |	Default |	Description |
+|-----------|----------|------|---------|-------------|
+| movie_id or imdb_id	| ✔️ | Integer (Unsigned)	| null | The YTS ID of the movie or the IMDB ID |
 
 
 Response Type: Object
 
 | Field    | Type                       |
 |----------|----------------------------|
-| features | [`array<Entity>`](#entity) |
+| data | JSON |
 
-### `GET /features/:feature`
-Get feature details.
 
-Response Type: Object
+Example Query:
+https://yts.mx/api/v2/movie_details.jsonp?imdb_id=tt0172495
 
-| Field           | Type                  | Comments                    |
-|-----------------|-----------------------|-----------------------------|
-| entity          | [`Entity`](#entity)   |                             |
-| referredEntities| `map<string, object>` | For compatibility, not used |
-
-### `DELETE /entity/{entity}`
-Deletes entity
-
-### `POST /projects`
-Create new project
-
-+ Request Type: [`ProjectDefinition`](#projectdefinition)
-+ Response Type: Object
-
-| Field | Type |
-|-------|------|
-| guid  | Guid |
-
-### `POST /projects/{project}/datasources`
-Create new source in the project
-
-+ Request Type: [`SourceDefinition`](#sourcedefinition)
-+ Response Type: Object
-
-| Field | Type |
-|-------|------|
-| guid  | Guid |
-
-### `POST /projects/{project}/anchors`
-Create new anchor in the project
-
-+ Request Type: [`AnchorDefinition`](#anchordefinition)
-+ Response Type: Object
-
-| Field | Type |
-|-------|------|
-| guid  | Guid |
-
-### `POST /projects/{project}/anchors/{anchor}/features`
-Create new anchor feature in the project under specified anchor
-
-+ Request Type: [`AnchorFeatureDefinition`](#anchorfeaturedefinition)
-+ Response Type: Object
-
-| Field | Type |
-|-------|------|
-| guid  | Guid |
-
-### `POST /projects/{project}/derivedfeatures`
-Create new derived feature in the project
-
-+ Request Type: [`DerivedFeatureDefinition`](#derivedfeaturedefinition)
-+ Response Type: Object
-
-| Field | Type |
-|-------|------|
-| guid  | Guid |
+Example Output:
+```
+{
+  "status": "ok",
+  "status_message": "Query was successful",
+  "data": {
+    "movie": {
+      "id": 1317,
+      "url": "https://yts.mx/movies/gladiator-2000",
+      "imdb_code": "tt0172495",
+      "title": "Gladiator",
+      "title_english": "Gladiator",
+      "title_long": "Gladiator (2000)",
+      "slug": "gladiator-2000",
+      "year": 2000,
+      "rating": 8.5,
+      "runtime": 155,
+      "genres": ["Action", "Adventure", "Drama", "Romance"],
+      "like_count": 606,
+      "description_intro": "Maximus is a powerful Roman general, loved by the people and the aging Emperor, Marcus Aurelius. Before his death, the Emperor chooses Maximus to be his heir over his own son, Commodus, and a power struggle leaves Maximus and his family condemned to death. The powerful general is unable to save his family, and his loss of will allows him to get captured and put into the Gladiator games until he dies. The only desire that fuels him now is the chance to rise to the top so that he will be able to look into the eyes of the man who will feel his revenge.—Chris \"Morphy\" Terry",
+      "description_full": "Maximus is a powerful Roman general, loved by the people and the aging Emperor, Marcus Aurelius. Before his death, the Emperor chooses Maximus to be his heir over his own son, Commodus, and a power struggle leaves Maximus and his family condemned to death. The powerful general is unable to save his family, and his loss of will allows him to get captured and put into the Gladiator games until he dies. The only desire that fuels him now is the chance to rise to the top so that he will be able to look into the eyes of the man who will feel his revenge.—Chris \"Morphy\" Terry",
+      "yt_trailer_code": "P5ieIbInFpg",
+      "language": "en",
+      "mpa_rating": "",
+      "background_image": "https://yts.mx/assets/images/movies/Gladiator_EXTENDED_2000/background.jpg",
+      "background_image_original": "https://yts.mx/assets/images/movies/Gladiator_EXTENDED_2000/background.jpg",
+      "small_cover_image": "https://yts.mx/assets/images/movies/Gladiator_EXTENDED_2000/small-cover.jpg",
+      "medium_cover_image": "https://yts.mx/assets/images/movies/Gladiator_EXTENDED_2000/medium-cover.jpg",
+      "large_cover_image": "https://yts.mx/assets/images/movies/Gladiator_EXTENDED_2000/large-cover.jpg",
+      "torrents": [
+        {
+          "url": "https://yts.mx/torrent/download/3FBFACC87CC7108B60BB64D5C3A38FBB8226B21E",
+          "hash": "3FBFACC87CC7108B60BB64D5C3A38FBB8226B21E",
+          "quality": "720p",
+          "type": "bluray",
+          "is_repack": "0",
+          "video_codec": "x264",
+          "bit_depth": "8",
+          "audio_channels": "2.0",
+          "seeds": 0,
+          "peers": 0,
+          "size": "1.10 GB",
+          "size_bytes": 1181116006,
+          "date_uploaded": "2015-10-31 23:40:53",
+          "date_uploaded_unix": 1446331253
+        },
+        {
+          "url": "https://yts.mx/torrent/download/9BFAB920305925F9954D8C4B9DEDCD4C6B12FFEA",
+          "hash": "9BFAB920305925F9954D8C4B9DEDCD4C6B12FFEA",
+          "quality": "1080p",
+          "type": "bluray",
+          "is_repack": "0",
+          "video_codec": "x264",
+          "bit_depth": "8",
+          "audio_channels": "2.0",
+          "seeds": 100,
+          "peers": 80,
+          "size": "1.60 GB",
+          "size_bytes": 1717986918,
+          "date_uploaded": "2015-10-31 23:40:56",
+          "date_uploaded_unix": 1446331256
+        },
+        {
+          "url": "https://yts.mx/torrent/download/34037A882E86E721070226D459C592F4A5A589A9",
+          "hash": "34037A882E86E721070226D459C592F4A5A589A9",
+          "quality": "2160p",
+          "type": "bluray",
+          "is_repack": "",
+          "video_codec": "x265",
+          "bit_depth": "10",
+          "audio_channels": "5.1",
+          "seeds": 100,
+          "peers": 25,
+          "size": "8.09 GB",
+          "size_bytes": 8686571356,
+          "date_uploaded": "2022-02-26 16:10:22",
+          "date_uploaded_unix": 1645888222
+        }
+      ],
+      "date_uploaded": "2015-10-31 23:40:53",
+      "date_uploaded_unix": 1446331253
+    }
+  },
+  "@meta": {
+    "server_time": 1741622674,
+    "server_timezone": "CET",
+    "api_version": 2,
+    "execution_time": "0 ms"
+  }
+}
+```
